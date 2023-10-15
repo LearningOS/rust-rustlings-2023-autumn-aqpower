@@ -27,7 +27,6 @@ enum IntoColorError {
     IntConversion,
 }
 
-// I AM NOT DONE
 
 // Your task is to complete this implementation and return an Ok result of inner
 // type Color. You need to create an implementation for a tuple of three
@@ -41,6 +40,24 @@ enum IntoColorError {
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = IntoColorError;
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        let (a, b, c) = tuple;
+        let ua = match a.to_string().parse::<u8>() {
+            Ok(num) => num,
+            _ => return Err(IntoColorError::IntConversion),
+        };
+        let ub = match b.to_string().parse::<u8>() {
+            Ok(num) => num,
+            _ => return Err(IntoColorError::IntConversion),
+        };
+        let uc = match c.to_string().parse::<u8>() {
+            Ok(num) => num,
+            _ => return Err(IntoColorError::IntConversion),
+        };
+        Ok(Color {
+            red: ua,
+            green: ub,
+            blue: uc,
+        })
     }
 }
 
@@ -48,6 +65,29 @@ impl TryFrom<(i16, i16, i16)> for Color {
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        if arr.len() != 3 {
+            return Err(IntoColorError::BadLen);
+        }
+        let a: Vec<Option<u8>> = arr
+            .iter()
+            .map(|x| {
+                if x.to_string().parse::<u8>().is_err() {
+                    None
+                } else {
+                    Some(x.to_string().parse::<u8>().unwrap())
+                }
+            })
+            .collect();
+        for item in &a {
+            if *item == None {
+                return Err(IntoColorError::IntConversion);
+            }
+        }
+        Ok(Color {
+            red: a[0].unwrap(),
+            green: a[1].unwrap(),
+            blue: a[2].unwrap(),
+        })
     }
 }
 
@@ -55,6 +95,30 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        let arr: Vec<i16> = slice.iter().map(|x| x.clone()).collect();
+        if arr.len() != 3 {
+            return Err(IntoColorError::BadLen);
+        }
+        let a: Vec<Option<u8>> = arr
+            .iter()
+            .map(|x| {
+                if x.to_string().parse::<u8>().is_err() {
+                    None
+                } else {
+                    Some(x.to_string().parse::<u8>().unwrap())
+                }
+            })
+            .collect();
+        for item in &a {
+            if *item == None {
+                return Err(IntoColorError::IntConversion);
+            }
+        }
+        Ok(Color {
+            red: a[0].unwrap(),
+            green: a[1].unwrap(),
+            blue: a[2].unwrap(),
+        })
     }
 }
 
